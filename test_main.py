@@ -23,3 +23,11 @@ def test_get_accuracy_label_indicator():
     assert response.status_code == 200
     assert response.json() == {"accuracy": 0.50}
 
+
+def test_get_accuracy_label_indicator_lengths():
+    # Inputs as label indicator arrays of different nested list lengths.
+    item_data = {"ground_truth": [[0, 1], [1, 1], [1]],
+                 "predictions": [[0, 1], [1, 1], [0]]}
+    response = client.post("/clf_accuracy", json=item_data)
+    assert response.status_code != 200
+

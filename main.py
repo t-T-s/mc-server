@@ -1,21 +1,8 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from metrics import clf_accuracy_score
-from typing import List
+from data_validators import ClfLabels
 
 app = FastAPI()
-
-# pydantic models
-
-
-class ClfLabels(BaseModel):
-    ground_truth: List[int] = [1, 2, 3, 4, 5]
-    predictions: List[int] = [1, 2, 3, 4, 5]
-
-
-class MetricResponse(BaseModel):
-    metric_value: dict
-
 
 @app.get("/")
 async def root():
