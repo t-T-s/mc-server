@@ -1,8 +1,22 @@
-from sklearn.metrics import accuracy_score
+from core import scikit_accuracy, shapash_consistency, shapash_compacity, impact
 
 
 def clf_accuracy_score(ground_truth, predictions) -> float:
-    if len(ground_truth) != len(predictions):
-        return 0
-    accuracy = accuracy_score(ground_truth, predictions)
+    accuracy = scikit_accuracy(ground_truth, predictions)
     return accuracy
+
+
+def consistency_scores(contributions):
+    # TODO: Implement to get the generated plots (either in the client side
+    #  or create plots from the server side)
+    return shapash_consistency(contributions)
+
+
+def compacity_scores(contributions):
+    # TODO: Implement to get the generated plots (either in the client side
+    #  or create plots from the server side)
+    return shapash_compacity(contributions)
+
+
+def impact_score(contributions):
+    pass
