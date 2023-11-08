@@ -1,5 +1,6 @@
 from pydantic import BaseModel, model_validator
 from typing import List, Dict, Union
+from mc_exceptions import ShapeError
 
 
 # pydantic models
@@ -18,13 +19,13 @@ class ClfLabels(BaseModel):
         if any(isinstance(item, list) for item in self.ground_truth) and \
                 any(isinstance(item, list) for item in self.predictions):
             for _, value in fields.items():
-                output = all(len(sub) == 2 for sub in value)
-                assert output, ('For a multi class labels the label indicator array should have the same lengths for '
-                                'all the items')
+                if not all(len(sub) == 2 for sub in value):
+                    raise ShapeError('For a multi class labels the label indicator array should have the same '
+                                     'lengths for all the items')
         return self
 
 
-class Contributions(BaseModel):
+class ContributionsDict(BaseModel):
     # contribution_dict = {'KernelSHAP': contrib_KernelSHAP, 'SamplingSHAP': contrib_SamplingSHAP
     #  'LIME': contrib_LIME }
     contribution_dict: Dict[str, List[List[float]]] = {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
@@ -32,13 +33,28 @@ class Contributions(BaseModel):
                                                        'LIME': [[0.14, 0.2], [0.34, 0.4]]}
 
     @model_validator(mode='after')
-    def check_feature_columns(self) -> 'Contributions':
+    def check_feature_columns(self) -> 'ContributionsDict':
         # get all fields in the model
         # check if the internal lists are of same length
         for _, value in self.contribution_dict.items():
-            output = all(len(sub) == 2 for sub in value)
-            assert output, ('For a multi class labels the label indicator array should have the same lengths for all '
-                            'the items')
+            if all(len(sub) == value[0] for sub in value):
+                raise ShapeError('Contribution rows must be of same length for all the rows')
+        return self
+
+
+class Contributions(BaseModel):
+    # Contributions from one type of explainer
+    contributions: List[List[float]] = [[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012]]
+    selection: Union[List[int], None] = [0, 1]
+    distance: Union[float, None] = 0.9
+    nb_features: Union[int, None] = 2
+
+    @model_validator(mode='after')
+    def check_feature_columns(self) -> 'Contributions':
+        # get all fields in the model
+        # check if the internal lists are of same length
+        if all(len(sub) == self.contributions[0] for sub in self.contributions):
+            raise ShapeError('Contribution rows must be of same length for all the rows')
         return self
 
 

@@ -23,10 +23,15 @@ def calc_all_consistency_scores(cns, contributions):
 
 
 # Convert contributions list to pandas DataFrame
-def convert_contrib_list_to_dataframe(contributions):
+def convert_contrib_dict_to_dataframe(contributions):
     for key, value in contributions.items():
         contributions[key] = pd.DataFrame(value)
     return contributions
+
+
+def convert_contrib_to_dataframe(contributions: list):
+    pd_contributions = pd.DataFrame(contributions)
+    return pd_contributions
 
 
 # create dummy model for smart explainer
@@ -38,5 +43,5 @@ def create_dummy_model():
     return rf
 
 
-def transform_to_inverse(xpl):
+def get_one_minus_distance_reached(xpl):
     return np.mean(1 - xpl.features_compacity['distance_reached'])

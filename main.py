@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from metrics import clf_accuracy_score, consistency_scores, compacity_scores, impact_score
-from data_validators import ClfLabels, Contributions
+from data_validators import ClfLabels, ContributionsDict, Contributions
 
 app = FastAPI()
 
@@ -23,7 +23,7 @@ async def post_accuracy(payload: ClfLabels):
 
 
 @app.post("/consistency", status_code=200)
-async def post_consistency(payload: Contributions):
+async def post_consistency(payload: ContributionsDict):
     contributions = payload.contribution_dict
 
     average_consistency, pairwise_scores = consistency_scores(contributions)
@@ -37,13 +37,21 @@ async def post_consistency(payload: Contributions):
 # To be implemented
 @app.post("/compacity", status_code=200)
 async def post_compacity(payload: Contributions):
-    pass
-    return None
+    contributions = payload.contributions
+    selection = payload.selection
+    distance = payload.distance
+    nb_features = payload.nb_features
+
+    response_model = compacity_scores(contributions=contributions
+                                      , selection=selection
+                                      , distance=distance
+                                      , nb_features=nb_features)
+    # TODO: Validate the response with pydantic
+    return response_model
 
 
 # To be implemented
 @app.post("/impact", status_code=200)
-async def post_impact(payload: Contributions):
+async def post_impact(payload: ClfLabels):
     pass
     return None
-
