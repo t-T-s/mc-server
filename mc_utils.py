@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from itertools import combinations
+from sklearn.ensemble import RandomForestClassifier
 
 
 # Consistency calculation with shapash
@@ -26,3 +27,16 @@ def convert_contrib_list_to_dataframe(contributions):
     for key, value in contributions.items():
         contributions[key] = pd.DataFrame(value)
     return contributions
+
+
+# create dummy model for smart explainer
+def create_dummy_model():
+    X_train = [[0, 5, 6], [1, 1, 9]]
+    y_train = [0, 1]
+    rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
+    rf.fit(X_train, y_train)
+    return rf
+
+
+def transform_to_inverse(xpl):
+    return np.mean(1 - xpl.features_compacity['distance_reached'])

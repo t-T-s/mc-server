@@ -11,7 +11,7 @@ async def root():
 
 
 @app.post("/clf_accuracy", status_code=200)
-async def get_accuracy(payload: ClfLabels):
+async def post_accuracy(payload: ClfLabels):
     ground_truth = payload.ground_truth
     predictions = payload.predictions
 
@@ -23,7 +23,7 @@ async def get_accuracy(payload: ClfLabels):
 
 
 @app.post("/consistency", status_code=200)
-async def get_consistency(payload: Contributions):
+async def post_consistency(payload: Contributions):
     contributions = payload.contribution_dict
 
     average_consistency, pairwise_scores = consistency_scores(contributions)
@@ -32,3 +32,18 @@ async def get_consistency(payload: Contributions):
                       "pairwise_scores": pairwise_scores}
     # TODO: Validate the response with pydantic
     return response_model
+
+
+# To be implemented
+@app.post("/compacity", status_code=200)
+async def post_compacity(payload: Contributions):
+    pass
+    return None
+
+
+# To be implemented
+@app.post("/impact", status_code=200)
+async def post_impact(payload: Contributions):
+    pass
+    return None
+

@@ -1,4 +1,6 @@
 from core import scikit_accuracy, shapash_consistency, shapash_compacity, impact
+# Here the metrics will be clearly demarcated for different use case.
+# e.g.: with plots as outputs, with numbers as outputs, etc.
 
 
 def clf_accuracy_score(ground_truth, predictions) -> float:
