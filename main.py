@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from metrics import clf_accuracy_score, consistency_scores, compacity_scores, impact_score
+from metrics import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
 from data_validators import ClfLabels, ContributionsDict, Contributions
 
 app = FastAPI()
@@ -10,7 +10,7 @@ async def root():
     return {"message": "Root"}
 
 
-@app.post("/clf_accuracy", status_code=200)
+@app.post("/clf_accuracy_metric", status_code=200)
 async def post_accuracy(payload: ClfLabels):
     ground_truth = payload.ground_truth
     predictions = payload.predictions
@@ -22,7 +22,7 @@ async def post_accuracy(payload: ClfLabels):
     return response_model
 
 
-@app.post("/consistency", status_code=200)
+@app.post("/consistency_metric", status_code=200)
 async def post_consistency(payload: ContributionsDict):
     contributions = payload.contribution_dict
 
@@ -35,7 +35,7 @@ async def post_consistency(payload: ContributionsDict):
 
 
 # To be implemented
-@app.post("/compacity", status_code=200)
+@app.post("/compacity_metric", status_code=200)
 async def post_compacity(payload: Contributions):
     contributions = payload.contributions
     selection = payload.selection
@@ -51,7 +51,13 @@ async def post_compacity(payload: Contributions):
 
 
 # To be implemented
-@app.post("/impact", status_code=200)
-async def post_impact(payload: ClfLabels):
-    pass
-    return None
+@app.post("/evasion_impact_metric", status_code=200)
+async def post_evasion_impact(payload: ClfLabels):
+    ground_truth = payload.ground_truth
+    predictions = payload.predictions
+
+    metric_result = evasion_impact_score(ground_truth=ground_truth
+                                         , predictions=predictions)
+    response_model = {"impact": metric_result}
+    # TODO: Validate the response with pydantic
+    return response_model

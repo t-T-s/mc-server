@@ -42,10 +42,10 @@ def shapash_compacity_from_contributions(contributions, selection=None, distance
     model = mc_utils.create_dummy_model()
     if selection is None:
         selection = list(range(len(contributions)))
-    pd_contribs = mc_utils.convert_contrib_to_dataframe(contributions)
+    pd_contributions = mc_utils.convert_contrib_to_dataframe(contributions)
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
-    xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contribs)
+    xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contributions)
     xpl.compute_features_compacity(selection=selection
                                    , distance=distance
                                    , nb_features=nb_features)
@@ -53,5 +53,6 @@ def shapash_compacity_from_contributions(contributions, selection=None, distance
     return xpl.features_compacity
 
 
-def impact(contributions):
-    pass
+def evasion_impact(ground_truth, predictions) -> float:
+    return 1-accuracy_score(ground_truth, predictions)
+
