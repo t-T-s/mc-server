@@ -1,5 +1,5 @@
 import pytest
-from metrics import consistency_scores, compacity_scores , impact_score
+from app.service.metrics_service import consistency_scores
 
 
 def test_consistency_scores():

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, model_validator
 from typing import List, Dict, Union
-from mc_exceptions import ShapeError
+from app.utils.mc_exceptions import ShapeError
 
 
 # pydantic models

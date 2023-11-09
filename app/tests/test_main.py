@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app
+from app.main import app
 from typing import Dict
 
 # Create a TestClient to make requests to your FastAPI application

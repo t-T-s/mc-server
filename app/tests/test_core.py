@@ -1,7 +1,6 @@
 import pytest
-from core import shapash_compacity_from_contributions
-from mc_utils import convert_contrib_to_dataframe, create_dummy_model
-import numpy as np
+from app.core.metrics import shapash_compacity_from_contributions
+from app.core.metric_utils import convert_contrib_to_dataframe
 
 
 def test_shapash_compacity():
@@ -10,8 +9,8 @@ def test_shapash_compacity():
     selection = [0, 1, 2]
     distance = 0.9
     nb_features = 2
-    pd_contribs = convert_contrib_to_dataframe(contributions)
-    feature_compacity = shapash_compacity_from_contributions(contributions=pd_contribs
+    pd_contributions = convert_contrib_to_dataframe(contributions)
+    feature_compacity = shapash_compacity_from_contributions(contributions=pd_contributions
                                           , selection=selection
                                           , distance=distance
                                           , nb_features=nb_features)

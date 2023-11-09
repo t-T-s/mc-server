@@ -1,13 +1,8 @@
-from fastapi import FastAPI, HTTPException
-from metrics import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
-from data_validators import ClfLabels, ContributionsDict, Contributions
+from fastapi import FastAPI
+from app.service.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
+from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
 
 app = FastAPI()
-
-
-@app.get("/")
-async def root():
-    return {"message": "Root"}
 
 
 @app.post("/clf_accuracy_metric", status_code=200)

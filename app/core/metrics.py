@@ -1,8 +1,7 @@
 from sklearn.metrics import accuracy_score
-import mc_utils
 from shapash.explainer.consistency import Consistency
 from shapash import SmartExplainer
-
+from app.core import metric_utils
 
 # Here the metrics will be implemented with the external libraries.
 
@@ -17,9 +16,9 @@ def shapash_consistency(contributions_dict):
     # names and values are pandas DataFrames: be careful to have dataframes
     # with same shape, index and column names
     cns = Consistency()
-    pd_contributions = mc_utils.convert_contrib_dict_to_dataframe(contributions_dict)
+    pd_contributions = metric_utils.convert_contrib_dict_to_dataframe(contributions_dict)
     cns.compile(contributions=pd_contributions)
-    return mc_utils.calc_all_consistency_scores(cns, pd_contributions)
+    return metric_utils.calc_all_consistency_scores(cns, pd_contributions)
 
 
 def shapash_compacity_from_contributions(contributions, selection=None, distance=0.9, nb_features=5):
@@ -39,10 +38,10 @@ def shapash_compacity_from_contributions(contributions, selection=None, distance
 
     return: dict of features compacity
     """
-    model = mc_utils.create_dummy_model()
+    model = metric_utils.create_dummy_model()
     if selection is None:
         selection = list(range(len(contributions)))
-    pd_contributions = mc_utils.convert_contrib_to_dataframe(contributions)
+    pd_contributions = metric_utils.convert_contrib_to_dataframe(contributions)
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contributions)
