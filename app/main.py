@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.service.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
+from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
 from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
 
 app = FastAPI()
@@ -45,7 +45,6 @@ async def post_compacity(payload: Contributions):
     return response_model
 
 
-# To be implemented
 @app.post("/evasion_impact_metric", status_code=200)
 async def post_evasion_impact(payload: ClfLabels):
     ground_truth = payload.ground_truth
