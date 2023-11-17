@@ -69,6 +69,21 @@ def test_post_consistency_plot():
     print("Image saved to test_consistency_endpoint_response_image.png successfully!")
 
 
+def test_post_compacity_plot():
+    # Output test: Basic invocation test
+    item_data = {"contributions": [[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012]],
+                 "selection": [0, 1],
+                 "distance": 0.9,
+                 "nb_features": 2}
+    response = client.post("/compacity_metric_plot", json=item_data)
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == 'image/png'
+    with open("assets/test_compacity_endpoint_response_image.png", "wb") as f:
+        f.write(response.content)
+    print(response.headers)
+    print("Image saved to test_compacity_endpoint_response_image.png successfully!")
+
+
 def test_post_compacity_contributions_row_lengths():
     # Input test: as label indicator arrays of different nested list lengths.
     item_data = {"contributions": [[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012]],

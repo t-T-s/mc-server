@@ -38,16 +38,16 @@ def test_plot_consistency():
     assert isinstance(consistency_plot, plt.Figure)
 
 
-def test_plot_compacity():
-    # Test the output of metrics.shapash_compacity_plot_from_contributions
+def test_shapash_compacity_plot():
+    # Test the output of metrics.shapash_compacity_plot
     contributions = [[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012], [0.3, 0.42, 0.24, 0.011]]
     selection = [0, 1, 2]
     distance = 0.9
     nb_features = 2
-    compacity_plot = metrics.shapash_compacity_plot_from_contributions(contributions=contributions
-                                                                       , selection=selection
-                                                                       , distance=distance
-                                                                       , nb_features=nb_features)
+    compacity_plot = metrics.shapash_compacity_plot(contributions=contributions
+                                                    , selection=selection
+                                                    , distance=distance
+                                                    , nb_features=nb_features)
     img_buf = io.BytesIO()
     img_bytes = compacity_plot.to_image('png', engine='kaleido')
     compacity_plot.write_image("assets/test_compacity_core_image.png", format="png")

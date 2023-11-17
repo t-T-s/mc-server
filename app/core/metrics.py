@@ -22,19 +22,6 @@ def shapash_consistency(contributions_dict):
     return avg_consistency, pairwise_consistencies
 
 
-def shapash_consistency_plot(contributions_dict):
-    # The format must be a dictionary where keys are the methods
-    # names and values are pandas DataFrames: be careful to have dataframes
-    # with same shape, index and column names
-    cns = Consistency()
-    pd_contributions = metric_utils.convert_contrib_dict_to_dataframe(contributions_dict)
-    cns.compile(contributions=pd_contributions)
-    avg_consistency, pairwise_consistencies = metric_utils.calc_all_consistency_scores(cns, pd_contributions)
-    consistency_plot = metric_utils.plot_consistency(cns)
-    consistency_plot_buffer = metric_utils.buffer_plot(consistency_plot)
-    return avg_consistency, pairwise_consistencies, consistency_plot_buffer
-
-
 def shapash_compacity_from_contributions(contributions, selection=None, distance=0.9, nb_features=5):
     """
     model: dummy model
@@ -64,7 +51,19 @@ def shapash_compacity_from_contributions(contributions, selection=None, distance
     return xpl.features_compacity
 
 
-def shapash_compacity_plot_from_contributions(contributions, selection=None, distance=0.9, nb_features=5):
+def shapash_consistency_plot(contributions_dict):
+    # The format must be a dictionary where keys are the methods
+    # names and values are pandas DataFrames: be careful to have dataframes
+    # with same shape, index and column names
+    cns = Consistency()
+    pd_contributions = metric_utils.convert_contrib_dict_to_dataframe(contributions_dict)
+    cns.compile(contributions=pd_contributions)
+    # avg_consistency, pairwise_consistencies = metric_utils.calc_all_consistency_scores(cns, pd_contributions)
+    comparison_plot = metric_utils.plot_consistency(cns)
+    return comparison_plot
+
+
+def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_features=5):
     """
     model: dummy model
     contributions: contributions as a list of lists
@@ -86,10 +85,10 @@ def shapash_compacity_plot_from_contributions(contributions, selection=None, dis
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contributions)
-    fig = metric_utils.plot_compacity(xpl, selection=selection
-                                      , approx=distance
-                                      , nb_features=nb_features)
-    return fig
+    compacity_plot = metric_utils.plot_compacity(xpl, selection=selection
+                                                 , approx=distance
+                                                 , nb_features=nb_features)
+    return compacity_plot
 
 
 def evasion_impact(ground_truth, predictions) -> float:
