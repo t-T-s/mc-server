@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, BackgroundTasks
-from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores,\
+from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
     evasion_impact_score, consistency_plot, compacity_plot
 from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
 
@@ -60,16 +60,16 @@ async def post_compacity(payload: Contributions):
 
 @app.post("/compacity_metric_plot", status_code=200)
 async def post_compacity_plot(payload: Contributions
-                                , background_tasks: BackgroundTasks):
+                              , background_tasks: BackgroundTasks):
     contributions = payload.contributions
     selection = payload.selection
     distance = payload.distance
     nb_features = payload.nb_features
 
     image_buffer = compacity_plot(contributions=contributions
-                                      , selection=selection
-                                      , distance=distance
-                                      , nb_features=nb_features)
+                                  , selection=selection
+                                  , distance=distance
+                                  , nb_features=nb_features)
     buf_contents: bytes = image_buffer.getvalue()
     background_tasks.add_task(image_buffer.close)
     headers = {'Content-Disposition': 'inline; filename="compacity.png"'}
