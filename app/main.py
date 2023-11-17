@@ -1,5 +1,6 @@
-from fastapi import FastAPI
-from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, evasion_impact_score
+from fastapi import FastAPI, Response, BackgroundTasks
+from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores,\
+    evasion_impact_score, consistency_plot
 from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
 
 app = FastAPI()
@@ -27,6 +28,18 @@ async def post_consistency(payload: ContributionsDict):
                       "pairwise_scores": pairwise_scores}
     # TODO: Validate the response with pydantic
     return response_model
+
+
+@app.post("/consistency_metric_plot", status_code=200)
+async def post_consistency_plot(payload: ContributionsDict
+                                , background_tasks: BackgroundTasks):
+    contributions = payload.contribution_dict
+
+    image_buffer = consistency_plot(contributions)
+    buf_contents: bytes = image_buffer.getvalue()
+    background_tasks.add_task(image_buffer.close)
+    headers = {'Content-Disposition': 'inline; filename="consistency.png"'}
+    return Response(buf_contents, headers=headers, media_type='image/png')
 
 
 # To be implemented

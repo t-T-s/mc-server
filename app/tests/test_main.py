@@ -55,12 +55,26 @@ def test_post_consistency_scores():
     assert isinstance(response.json()["pairwise_scores"], Dict)
 
 
+def test_post_consistency_plot():
+    # Output test: Basic invocation test
+    contrib_dict = {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
+                    'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
+                    'LIME': [[0.14, 0.2], [0.34, 0.4]]}
+    response = client.post("/consistency_metric_plot", json=contrib_dict)
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == 'image/png'
+    with open("assets/test_consistency_endpoint_response_image.png", "wb") as f:
+        f.write(response.content)
+    print(response.headers)
+    print("Image saved to test_consistency_endpoint_response_image.png successfully!")
+
+
 def test_post_compacity_contributions_row_lengths():
     # Input test: as label indicator arrays of different nested list lengths.
     item_data = {"contributions": [[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012]],
-                "selection": [0, 1],
-                "distance": 0.9,
-                "nb_features": 2}
+                 "selection": [0, 1],
+                 "distance": 0.9,
+                 "nb_features": 2}
     response = client.post("/compacity_metric", json=item_data)
     print(response.json())
     assert response.status_code == 200
