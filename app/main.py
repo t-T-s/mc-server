@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, BackgroundTasks
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
-    evasion_impact_score, consistency_plot, compacity_plot
-from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
+    evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score
+from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput
 
 app = FastAPI()
 
@@ -84,5 +84,16 @@ async def post_evasion_impact(payload: ClfLabels):
     metric_result = evasion_impact_score(ground_truth=ground_truth
                                          , predictions=predictions)
     response_model = {"impact": metric_result}
+    # TODO: Validate the response with pydantic
+    return response_model
+
+
+@app.post("/user_diversity_metric", status_code=200)
+async def post_user_diversity(payload: UserDiversityInput):
+    x_results = payload.predictions
+    y_results = payload.client_ids
+    perplexity = payload.perplexity
+
+    response_model = user_diversity_score(x_results, y_results, perplexity)
     # TODO: Validate the response with pydantic
     return response_model

@@ -60,3 +60,25 @@ class Contributions(BaseModel):
 
 class MetricResponse(BaseModel):
     metric_value: dict
+
+
+class UserDiversityInput(BaseModel):
+    predictions: List[List[float]] = [[-2.218350887298584, -2.198277711868286],
+                                      [-2.5687193870544434, -2.458390474319458],
+                                      [-2.0745654106140137, -2.329625368118286],
+                                      [-2.2383768558502197, -2.222764253616333],
+                                      [-2.269338846206665, -2.456698179244995],
+                                      [-1.9543006420135498, -2.549536943435669]]
+
+    client_ids: List[int] = [1, 1, 1, 2, 2, 2]
+    perplexity: int
+
+    @model_validator(mode='after')
+    def check_user_diversity(self) -> 'UserDiversityInput':
+        # get all fields in the model
+        # check if the internal lists are of same length
+        if len(self.predictions) != len(self.client_ids):
+            raise ShapeError('Predictions rows must be of same length for all the client IDs')
+        if len(self.perplexity) >= len(self.predictions):
+            raise ValueError('Perplexity must be less than total number of client IDs')
+        return self

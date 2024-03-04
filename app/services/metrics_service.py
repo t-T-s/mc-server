@@ -1,5 +1,5 @@
 from app.core.metrics import scikit_accuracy, shapash_consistency, shapash_compacity_from_contributions, \
-    evasion_impact, shapash_consistency_plot, shapash_compacity_plot
+    evasion_impact, shapash_consistency_plot, shapash_compacity_plot, tsne_user_diversity
 from app.core import metric_utils
 
 # Here the metrics will be clearly demarcated for different use case.
@@ -39,3 +39,6 @@ def compacity_plot(contributions, selection, distance, nb_features):
 
 def evasion_impact_score(ground_truth, predictions) -> float:
     return evasion_impact(ground_truth, predictions)
+
+def user_diversity_score(x_results, y_results, perplexity):
+    return tsne_user_diversity(x_results, y_results, perplexity)

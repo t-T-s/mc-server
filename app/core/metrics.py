@@ -1,8 +1,12 @@
+from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
 from shapash.explainer.consistency import Consistency
 from shapash import SmartExplainer
 from app.core import metric_utils
-
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Here the metrics will be implemented with the external libraries.
 
@@ -93,3 +97,23 @@ def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_featu
 
 def evasion_impact(ground_truth, predictions) -> float:
     return 1 - accuracy_score(ground_truth, predictions)
+
+def tsne_user_diversity(predictions, client_ids, perplexity):
+    predictions = np.array(predictions)
+    client_ids = np.array(client_ids)
+    tsne = TSNE(n_components=2, verbose=0, random_state=123, perplexity=perplexity)
+    z = tsne.fit_transform(predictions)
+    df = pd.DataFrame()
+    df["y"] = client_ids
+    df["comp-1"] = z[:, 0]
+    df["comp-2"] = z[:, 1]
+    df2 = df.to_json(orient = 'columns')
+    return df2
+
+    # sns.scatterplot(x="comp-1", y="comp-2", hue=df.y.tolist(),
+    #                 palette=sns.color_palette("hls", 10),
+    #                 data=df)
+    # plt.legend(fontsize=15, loc='lower left')
+
+def tsne_user_diversity_plot(x_results, y_results, perplexity):
+    df = tsne_user_diversity(x_results,y_results,perplexity)
