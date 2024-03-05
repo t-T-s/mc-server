@@ -37,7 +37,7 @@ def test_plot_consistency():
     pd_contributions = metric_utils.convert_contrib_dict_to_dataframe(contrib_dict)
     cns.compile(contributions=pd_contributions)
     consistency_plot = metric_utils.plot_consistency(cns)
-    consistency_plot.savefig('assets/test_consistency_core_image.png', bbox_inches='tight')
+    # consistency_plot.savefig('assets/test_consistency_core_image.png', bbox_inches='tight')
     assert isinstance(consistency_plot, plt.Figure)
 
 
@@ -69,6 +69,7 @@ def test_user_diversity_metric():
     perplexity = 4
     diversity = tsne_user_diversity(predictions, client_ids, perplexity)
     assert isinstance(diversity[0], str)
+
 
 if __name__ == '__main__':
     pytest.main(['-sv', __file__])

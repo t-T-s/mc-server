@@ -1,5 +1,5 @@
-from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
+from sklearn.manifold import TSNE
 from shapash.explainer.consistency import Consistency
 from shapash import SmartExplainer
 from app.core import metric_utils
@@ -117,3 +117,4 @@ def tsne_user_diversity(predictions, client_ids, perplexity):
 
 def tsne_user_diversity_plot(x_results, y_results, perplexity):
     df = tsne_user_diversity(x_results,y_results,perplexity)
+
