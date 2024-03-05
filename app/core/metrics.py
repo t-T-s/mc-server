@@ -5,8 +5,8 @@ from shapash import SmartExplainer
 from app.core import metric_utils
 import pandas as pd
 import numpy as np
-# import seaborn as sns
-# import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Here the metrics will be implemented with the external libraries.
 
@@ -115,6 +115,18 @@ def tsne_user_diversity(predictions, client_ids, perplexity):
     #                 data=df)
     # plt.legend(fontsize=15, loc='lower left')
 
-def tsne_user_diversity_plot(x_results, y_results, perplexity):
-    df = tsne_user_diversity(x_results,y_results,perplexity)
+def tsne_user_diversity_plot(predictions, client_ids, perplexity):
+    predictions = np.array(predictions)
+    client_ids = np.array(client_ids)
+    tsne = TSNE(n_components=2, verbose=0, random_state=123, perplexity=perplexity)
+    z = tsne.fit_transform(predictions)
+    df = pd.DataFrame()
+    df["y"] = client_ids
+    df["comp-1"] = z[:, 0]
+    df["comp-2"] = z[:, 1]
 
+    sns.scatterplot(x="comp-1", y="comp-2", hue=df.y.tolist(),
+                    palette=sns.color_palette("hls", 10),
+                    data=df)
+    plt.legend(fontsize=15, loc='lower left')
+    return plt.gcf()

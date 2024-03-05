@@ -79,6 +79,6 @@ class UserDiversityInput(BaseModel):
         # check if the internal lists are of same length
         if len(self.predictions) != len(self.client_ids):
             raise ShapeError('Predictions rows must be of same length for all the client IDs')
-        if len(self.perplexity) >= len(self.predictions):
+        if self.perplexity >= len(self.predictions):
             raise ValueError('Perplexity must be less than total number of client IDs')
         return self
