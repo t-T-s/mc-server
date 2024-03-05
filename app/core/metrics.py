@@ -5,8 +5,8 @@ from shapash import SmartExplainer
 from app.core import metric_utils
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
+# import seaborn as sns
+# import matplotlib.pyplot as plt
 
 # Here the metrics will be implemented with the external libraries.
 
