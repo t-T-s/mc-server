@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, BackgroundTasks
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
-    evasion_impact_score, consistency_plot, compacity_plot
-from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions
+    evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot
+from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput
 
 app = FastAPI()
 
@@ -86,3 +86,26 @@ async def post_evasion_impact(payload: ClfLabels):
     response_model = {"impact": metric_result}
     # TODO: Validate the response with pydantic
     return response_model
+
+
+@app.post("/user_diversity_metric", status_code=200)
+async def post_user_diversity(payload: UserDiversityInput):
+    x_results = payload.predictions
+    y_results = payload.client_ids
+    perplexity = payload.perplexity
+
+    response_model = user_diversity_score(x_results, y_results, perplexity)
+    # TODO: Validate the response with pydantic
+    return response_model
+
+@app.post("/user_diversity_metric_plot", status_code=200)
+async def post_user_diversity(payload: UserDiversityInput, background_tasks: BackgroundTasks):
+    x_results = payload.predictions
+    y_results = payload.client_ids
+    perplexity = payload.perplexity
+
+    image_buffer = user_diversity_plot(x_results, y_results, perplexity)
+    buf_contents: bytes = image_buffer.getvalue()
+    background_tasks.add_task(image_buffer.close)
+    headers = {'Content-Disposition': 'inline; filename="compacity.png"'}
+    return Response(buf_contents, headers=headers, media_type='image/png')

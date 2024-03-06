@@ -11,3 +11,4 @@ numpy~=1.25.2
 matplotlib~=3.8.0
 https://github.com/plotly/Kaleido/releases/download/v0.1.0.post1/kaleido-0.1.0.post1-py2.py3-none-win_amd64.whl ; sys_platform == 'darwin'
 kaleido ; sys_platform == 'linux'
+seaborn

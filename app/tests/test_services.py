@@ -1,6 +1,6 @@
 import pytest
 from app.services.metrics_service import consistency_scores, consistency_plot, \
-    compacity_plot
+    compacity_plot, user_diversity_plot
 import io
 
 
@@ -36,6 +36,21 @@ def test_compacity_plot():
     with open("assets/test_compacity_buffered_image.png", "wb") as f:
         f.write(comp_plot.getvalue())
     assert isinstance(comp_plot, io.BytesIO)
+
+def test_user_diversity_plot():
+    # Basic invocation test
+    predictions = [[-2.218350887298584, -2.198277711868286],
+                  [-2.5687193870544434, -2.458390474319458],
+                  [-2.0745654106140137, -2.329625368118286],
+                  [-2.2383768558502197, -2.222764253616333],
+                  [-2.269338846206665, -2.456698179244995],
+                  [-1.9543006420135498, -2.549536943435669]]
+    client_ids = [1, 1, 1, 2, 2, 2]
+    perplexity = 4
+    diversity_plt = user_diversity_plot(predictions, client_ids, perplexity)
+    with open("assets/test_user_diversity_image.png", "wb") as f:
+        f.write(diversity_plt.getvalue())
+    assert isinstance(diversity_plt, io.BytesIO)
 
 
 if __name__ == '__main__':

@@ -104,5 +104,26 @@ def test_post_impact_test():
     assert isinstance(response.json()['impact'], float)
 
 
+def test_post_user_diversity_plot():
+    # Output test: Basic invocation test
+    item_data = {
+    "predictions": [[-2.218350887298584, -2.198277711868286],
+                  [-2.5687193870544434, -2.458390474319458],
+                  [-2.0745654106140137, -2.329625368118286],
+                  [-2.2383768558502197, -2.222764253616333],
+                  [-2.269338846206665, -2.456698179244995],
+                  [-1.9543006420135498, -2.549536943435669]],
+    "client_ids" : [1, 1, 1, 2, 2, 2],
+    "perplexity" : 4
+    }
+    response = client.post("/user_diversity_metric_plot", json=item_data)
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == 'image/png'
+    with open("assets/test_user_diversity_image.png", "wb") as f:
+        f.write(response.content)
+    print(response.headers)
+    print("Image saved to test_user_diversity_image.png successfully!")
+
+
 if __name__ == '__main__':
     pytest.main(['-sv', __file__])
