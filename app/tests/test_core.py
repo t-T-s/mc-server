@@ -1,10 +1,13 @@
 import io
 
+import pandas
 import pytest
 from app.core import metrics
 from app.core import metric_utils
 from shapash.explainer.consistency import Consistency
 import matplotlib.pyplot as plt
+
+from app.core.metrics import tsne_user_diversity
 
 
 def test_shapash_compacity():
@@ -34,7 +37,7 @@ def test_plot_consistency():
     pd_contributions = metric_utils.convert_contrib_dict_to_dataframe(contrib_dict)
     cns.compile(contributions=pd_contributions)
     consistency_plot = metric_utils.plot_consistency(cns)
-    consistency_plot.savefig('assets/test_consistency_core_image.png', bbox_inches='tight')
+    # consistency_plot.savefig('assets/test_consistency_core_image.png', bbox_inches='tight')
     assert isinstance(consistency_plot, plt.Figure)
 
 
@@ -54,6 +57,18 @@ def test_shapash_compacity_plot():
     compacity_plot.write_image(img_buf, format="png")
     assert isinstance(img_buf, io.BytesIO)
     assert isinstance(img_bytes, bytes)
+
+def test_user_diversity_metric():
+    predictions = [[-2.218350887298584, -2.198277711868286],
+                   [-2.5687193870544434, -2.458390474319458],
+                   [-2.0745654106140137, -2.329625368118286],
+                   [-2.2383768558502197, -2.222764253616333],
+                   [-2.269338846206665, -2.456698179244995],
+                   [-1.9543006420135498, -2.549536943435669]]
+    client_ids = [1, 1, 1, 2, 2, 2]
+    perplexity = 4
+    diversity = tsne_user_diversity(predictions, client_ids, perplexity)
+    assert isinstance(diversity[0], str)
 
 
 if __name__ == '__main__':
