@@ -1,6 +1,6 @@
 from pydantic import BaseModel, model_validator
 from typing import List, Dict, Union
-from app.utils.mc_exceptions import ShapeError
+from fastapi import HTTPException
 
 
 # pydantic models
@@ -20,14 +20,13 @@ class ClfLabels(BaseModel):
                 any(isinstance(item, list) for item in self.predictions):
             for _, value in fields.items():
                 if not all(len(sub) == 2 for sub in value):
-                    raise ShapeError('For a multi class labels the label indicator array should have the same '
-                                     'lengths for all the items')
+                    raise HTTPException(status_code=422, detail='For a multi class labels the label indicator array '
+                                                                'should have the same'
+                                                                'lengths for all the items')
         return self
 
 
 class ContributionsDict(BaseModel):
-    # contribution_dict = {'KernelSHAP': contrib_KernelSHAP, 'SamplingSHAP': contrib_SamplingSHAP
-    #  'LIME': contrib_LIME }
     contribution_dict: Dict[str, List[List[float]]] = {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
                                                        'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
                                                        'LIME': [[0.14, 0.2], [0.34, 0.4]]}
@@ -36,9 +35,23 @@ class ContributionsDict(BaseModel):
     def check_feature_columns(self) -> 'ContributionsDict':
         # get all fields in the model
         # check if the internal lists are of same length
-        for _, value in self.contribution_dict.items():
-            if all(len(sub) == value[0] for sub in value):
-                raise ShapeError('Contribution rows must be of same length for all the rows')
+        # Initialize variables to store the expected number of rows and row length
+        first_key = list(self.contribution_dict.keys())[0]
+        expected_row_count = len(self.contribution_dict[first_key])
+        expected_row_length = len(self.contribution_dict[first_key][0])
+
+        # Check if all values have the same shape
+        same_shape = True
+
+        for key, value in self.contribution_dict.items():
+            if len(value) != expected_row_count:
+                same_shape = False
+                break
+            if any(len(row) != expected_row_length for row in value):
+                same_shape = False
+                break
+        if not same_shape:
+            raise HTTPException(status_code=422, detail='Contribution rows must be of same length for all the rows')
         return self
 
 
@@ -53,8 +66,8 @@ class Contributions(BaseModel):
     def check_feature_columns(self) -> 'Contributions':
         # get all fields in the model
         # check if the internal lists are of same length
-        if all(len(sub) == self.contributions[0] for sub in self.contributions):
-            raise ShapeError('Contribution rows must be of same length for all the rows')
+        if len(set(len(row) for row in self.contributions)) > 1:
+            raise HTTPException(status_code=422, detail='Contribution rows must be of same length for all the rows')
         return self
 
 
@@ -92,14 +105,16 @@ class StabilityData(BaseModel):
         # get all fields in the model
         # check if the internal lists are of same length
         if len(self.contributions) < 10 or len(self.x_input) < 10 or len(self.y_target) < 10:
-            raise NotImplementedError("The stability plot is only implemented for X data size of 10 rows or more. " +
-                                      "The contributions and y_target should be also of the same length")
-        if all(len(sub) == self.contributions[0] for sub in self.contributions):
-            raise ShapeError('Contribution rows must be of same length for all the rows')
-        if all(len(sub) == self.x_input[0] for sub in self.x_input):
-            raise ShapeError('Input X data rows must be of same length for all the rows')
-        if all(len(sub) == self.y_target[0] for sub in self.y_target):
-            raise ShapeError('Input y target rows must be of same length for all the rows')
+            raise HTTPException(status_code=422, detail="The stability plot is only implemented for X data size of 10 "
+                                                        "rows or more."
+                                                        "The contributions and y_target should be also of the same "
+                                                        "length")
+        if len(set(len(row) for row in self.contributions)) > 1:
+            raise HTTPException(status_code=422, detail='Contribution rows must be of same length for all the rows')
+        if len(set(len(row) for row in self.x_input)) > 1:
+            raise HTTPException(status_code=422, detail='Input X data rows must be of same length for all the rows')
+        if len(set(len(row) for row in self.y_target)) > 1:
+            raise HTTPException(status_code=422, detail='Input y target rows must be of same length for all the rows')
         return self
 
 
@@ -123,7 +138,8 @@ class UserDiversityInput(BaseModel):
         # get all fields in the model
         # check if the internal lists are of same length
         if len(self.predictions) != len(self.client_ids):
-            raise ShapeError('Predictions rows must be of same length for all the client IDs')
+            raise HTTPException(status_code=422,
+                                detail='Predictions rows must be of same length for all the client IDs')
         if self.perplexity >= len(self.predictions):
-            raise ValueError('Perplexity must be less than total number of client IDs')
+            raise HTTPException(status_code=422, detail='Perplexity must be less than total number of client IDs')
         return self

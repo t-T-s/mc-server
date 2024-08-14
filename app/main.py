@@ -4,9 +4,11 @@ from app.services.metrics_service import clf_accuracy_score, consistency_scores,
     stability_plot
 from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput, \
     StabilityData
-
+from app.utils.mc_exceptions import http_exception_handler, global_exception_handler
+from fastapi import HTTPException
 app = FastAPI()
-
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(Exception, global_exception_handler)
 
 @app.post("/clf_accuracy_metric", status_code=200)
 async def post_accuracy(payload: ClfLabels):
