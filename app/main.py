@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Response, BackgroundTasks
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
-    evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot
-from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput
+    evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot, \
+    stability_plot
+from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput, \
+    StabilityData
 
 app = FastAPI()
 
@@ -76,6 +78,29 @@ async def post_compacity_plot(payload: Contributions
     return Response(buf_contents, headers=headers, media_type='image/png')
 
 
+@app.post("/stability_metric_plot", status_code=200)
+async def post_stability_plot(payload: StabilityData
+                              , background_tasks: BackgroundTasks):
+    contributions = payload.contributions
+    x_input = payload.x_input
+    y_target = payload.y_target
+    selection = payload.selection
+    max_points = payload.max_points
+    max_features = payload.max_features
+
+    image_buffer = stability_plot(
+        X=x_input
+        , contributions=contributions
+        , y_target=y_target
+        , selection=selection
+        , max_points=max_points
+        , max_features=max_features)
+    buf_contents: bytes = image_buffer.getvalue()
+    background_tasks.add_task(image_buffer.close)
+    headers = {'Content-Disposition': 'inline; filename="stability.png"'}
+    return Response(buf_contents, headers=headers, media_type='image/png')
+
+
 @app.post("/evasion_impact_metric", status_code=200)
 async def post_evasion_impact(payload: ClfLabels):
     ground_truth = payload.ground_truth
@@ -97,6 +122,7 @@ async def post_user_diversity(payload: UserDiversityInput):
     response_model = user_diversity_score(x_results, y_results, perplexity)
     # TODO: Validate the response with pydantic
     return response_model
+
 
 @app.post("/user_diversity_metric_plot", status_code=200)
 async def post_user_diversity(payload: UserDiversityInput, background_tasks: BackgroundTasks):
