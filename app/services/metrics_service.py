@@ -1,5 +1,6 @@
 from app.core.metrics import scikit_accuracy, shapash_consistency, shapash_compacity_from_contributions, \
-    evasion_impact, shapash_consistency_plot, shapash_compacity_plot, tsne_user_diversity, tsne_user_diversity_plot
+    evasion_impact, shapash_consistency_plot, shapash_compacity_plot, tsne_user_diversity, tsne_user_diversity_plot, \
+    shapash_stability_plot
 from app.core import metric_utils
 import plotly.tools as tls
 
@@ -38,6 +39,16 @@ def compacity_plot(contributions, selection, distance, nb_features):
     image_buffer = metric_utils.buffer_plot(compacity_graph)
     return image_buffer
 
+def stability_plot(X, contributions, y_target, selection, max_points, max_features):
+    stability_graph = shapash_stability_plot(
+        x_encoded=X
+        , contributions=contributions
+        , y_target=y_target
+        , selection=selection
+        , max_points=max_points
+        , max_features=max_features)
+    image_buffer = metric_utils.buffer_plot(stability_graph)
+    return image_buffer
 
 def evasion_impact_score(ground_truth, predictions) -> float:
     return evasion_impact(ground_truth, predictions)
