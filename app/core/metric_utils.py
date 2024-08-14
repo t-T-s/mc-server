@@ -26,20 +26,20 @@ def calc_all_consistency_scores(cns, contributions):
 
 
 # Convert contributions list to pandas DataFrame
-def convert_contrib_dict_to_dataframe(contributions):
+def convert_contrib_dict_to_dataframe(contributions: dict):
     for key, value in contributions.items():
         contributions[key] = pd.DataFrame(value)
     return contributions
 
 
-def convert_contrib_to_dataframe(contributions: list):
+def convert_array_like_to_dataframe(contributions: list):
     pd_contributions = pd.DataFrame(contributions)
     return pd_contributions
 
 
 # create dummy model for smart explainer
 def create_dummy_model():
-    x_train = [[0, 5, 6], [1, 1, 9]]
+    x_train = [[0, 5, 6, 4], [1, 1, 9, 4]]
     y_train = [0, 1]
     rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
     rf.fit(x_train, y_train)
@@ -63,6 +63,11 @@ def plot_consistency(cns):
 
 def plot_compacity(xpl, selection, approx=0.9, nb_features=5):
     fig = xpl.plot.compacity_plot(selection=selection, approx=approx, nb_features=nb_features)
+    return fig
+
+
+def plot_stability(xpl, selection, max_points=500, max_features=10):
+    fig = xpl.plot.stability_plot(selection=selection, max_points=max_points, max_features=max_features)
     return fig
 
 

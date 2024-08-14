@@ -44,7 +44,7 @@ def shapash_compacity_from_contributions(contributions, selection=None, distance
     model = metric_utils.create_dummy_model()
     if selection is None:
         selection = list(range(len(contributions)))
-    pd_contributions = metric_utils.convert_contrib_to_dataframe(contributions)
+    pd_contributions = metric_utils.convert_array_like_to_dataframe(contributions)
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contributions)
@@ -85,7 +85,7 @@ def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_featu
     model = metric_utils.create_dummy_model()
     if selection is None:
         selection = list(range(len(contributions)))
-    pd_contributions = metric_utils.convert_contrib_to_dataframe(contributions)
+    pd_contributions = metric_utils.convert_array_like_to_dataframe(contributions)
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     xpl._get_contributions_from_backend_or_user(x=None, contributions=pd_contributions)
@@ -94,6 +94,36 @@ def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_featu
                                                  , nb_features=nb_features)
     return compacity_plot
 
+def shapash_stability_plot(x_encoded, contributions, y_target, selection=None, max_points=500, max_features=10):
+    """
+    model: dummy model
+    contributions: contributions as a list of lists
+    selection: a sample of the dataset on which to evaluate the metric expressed
+    as a list of indices (by default take the whole dataset if not too big)
+    list of indices of datapoints (The length of the output lists will be equal
+    to the length of the selection list)
+    distance (float): how close we want to be the reference model with all features (default 90%)
+                     – Left graph
+    nb_features (int): how many features are selected to evaluate the approximation (default 5)
+                    – Right graph
+
+    return: dict of features compacity
+    """
+    model = metric_utils.create_dummy_model()
+    # if selection is None:
+    #     selection = list(range(len(contributions)))
+    # Not the best method to do this, but it works. Later we can implement in a cleaner way.
+    xpl = SmartExplainer(model=model)
+    ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
+    xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
+                , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
+                , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
+    stability_plot = metric_utils.plot_stability(xpl
+                                                 , selection
+                                                 , max_points=max_points
+                                                 , max_features=max_features
+                                                 )
+    return stability_plot
 
 def evasion_impact(ground_truth, predictions) -> float:
     return 1 - accuracy_score(ground_truth, predictions)
