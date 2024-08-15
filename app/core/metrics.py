@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import random
+
 
 # Here the metrics will be implemented with the external libraries.
 
@@ -94,7 +96,46 @@ def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_featu
                                                  , nb_features=nb_features)
     return compacity_plot
 
-def shapash_stability_plot(x_encoded, contributions, y_target, selection=None, max_points=500, max_features=10):
+
+def shapash_stability_plot(x_encoded,
+                           contributions,
+                           y_target,
+                           selection=None,
+                           max_points=500,
+                           max_features=10,
+                           model=None):
+    """
+    model: dummy model
+    contributions: contributions as a list of lists
+    selection: a sample of the dataset on which to evaluate the metric expressed
+    as a list of indices (by default take the whole dataset if not too big)
+    list of indices of datapoints (The length of the output lists will be equal
+    to the length of the selection list)
+    distance (float): how close we want to be the reference model with all features (default 90%)
+                     – Left graph
+    nb_features (int): how many features are selected to evaluate the approximation (default 5)
+                    – Right graph
+
+    return: dict of features compacity
+    """
+    if model == None:
+        model = metric_utils.train_surrogate_rf_model(x=x_encoded, y=y_target, n_estimators=100, max_depth=10,
+                                                      random_state=0)
+    # Not the best method to do this, but it works. Later we can implement in a cleaner way.
+    xpl = SmartExplainer(model=model)
+    ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
+    xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
+                , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
+                , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
+    stability_plot = metric_utils.plot_stability(xpl
+                                                 , selection
+                                                 , max_points=max_points
+                                                 , max_features=max_features
+                                                 )
+    return stability_plot
+
+
+def shapash_feature_stability(x_encoded, contributions, y_target, selection=None, max_points=500):
     """
     model: dummy model
     contributions: contributions as a list of lists
@@ -110,23 +151,33 @@ def shapash_stability_plot(x_encoded, contributions, y_target, selection=None, m
     return: dict of features compacity
     """
     model = metric_utils.create_dummy_model()
-    # if selection is None:
-    #     selection = list(range(len(contributions)))
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
     xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
                 , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
                 , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
-    stability_plot = metric_utils.plot_stability(xpl
-                                                 , selection
-                                                 , max_points=max_points
-                                                 , max_features=max_features
-                                                 )
-    return stability_plot
+    print("x_init: ", xpl.x_init)
+    print("xpl_feature_stability_after_compile: ", xpl.features_stability)
+    if selection is None:
+        if xpl.x_init.shape[0] <= max_points:
+            list_ind = xpl.x_init.index.tolist()
+            feature_stability = xpl.compute_features_stability(list_ind)
+            print("list_ind: ", list_ind)
+            print("feature_stability_1: ", feature_stability)
+        else:
+            list_ind = random.sample(xpl.x_init.index.tolist(), max_points)
+            feature_stability = xpl.compute_features_stability(list_ind)
+            print("feature_stability_2:", feature_stability)
+    else:
+        feature_stability = xpl.compute_features_stability(selection)
+        print("feature_stability_3:", feature_stability)
+    return feature_stability
+
 
 def evasion_impact(ground_truth, predictions) -> float:
     return 1 - accuracy_score(ground_truth, predictions)
+
 
 def tsne_user_diversity(predictions, client_ids, perplexity):
     predictions = np.array(predictions)
@@ -137,13 +188,14 @@ def tsne_user_diversity(predictions, client_ids, perplexity):
     df["y"] = client_ids
     df["comp-1"] = z[:, 0]
     df["comp-2"] = z[:, 1]
-    df2 = df.to_json(orient = 'columns')
+    df2 = df.to_json(orient='columns')
     return df2
 
     # sns.scatterplot(x="comp-1", y="comp-2", hue=df.y.tolist(),
     #                 palette=sns.color_palette("hls", 10),
     #                 data=df)
     # plt.legend(fontsize=15, loc='lower left')
+
 
 def tsne_user_diversity_plot(predictions, client_ids, perplexity):
     predictions = np.array(predictions)

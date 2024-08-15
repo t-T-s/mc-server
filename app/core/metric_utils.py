@@ -46,6 +46,12 @@ def create_dummy_model():
     return rf
 
 
+def train_surrogate_rf_model(x, y, **kwargs):
+    rf = RandomForestClassifier(**kwargs)
+    rf.fit(x, y)
+    return rf
+
+
 def get_one_minus_distance_reached(xpl):
     return np.mean(1 - xpl.features_compacity['distance_reached'])
 
