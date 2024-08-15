@@ -97,13 +97,15 @@ def shapash_compacity_plot(contributions, selection=None, distance=0.9, nb_featu
     return compacity_plot
 
 
-def shapash_stability_plot(x_encoded,
+def shapash_stability_plot(x_test,
                            contributions,
                            y_target,
                            selection=None,
                            max_points=500,
                            max_features=10,
-                           model=None):
+                           model=None,
+                           x_train=None,
+                           y_train=None):
     """
     model: dummy model
     contributions: contributions as a list of lists
@@ -119,12 +121,12 @@ def shapash_stability_plot(x_encoded,
     return: dict of features compacity
     """
     if model == None:
-        model = metric_utils.train_surrogate_rf_model(x=x_encoded, y=y_target, n_estimators=100, max_depth=10,
+        model = metric_utils.train_surrogate_rf_model(x=x_train, y=y_train, n_estimators=100, max_depth=10,
                                                       random_state=0)
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
     ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
-    xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
+    xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_test)
                 , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
                 , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
     stability_plot = metric_utils.plot_stability(xpl

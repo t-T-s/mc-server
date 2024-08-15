@@ -41,7 +41,7 @@ def compacity_plot(contributions, selection, distance, nb_features):
 
 def stability_plot(X, contributions, y_target, selection, max_points, max_features):
     stability_graph = shapash_stability_plot(
-        x_encoded=X
+          x_test=X
         , contributions=contributions
         , y_target=y_target
         , selection=selection
