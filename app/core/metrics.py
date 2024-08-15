@@ -120,12 +120,16 @@ def shapash_stability_plot(x_test,
 
     return: dict of features compacity
     """
-    if model == None:
-        model = metric_utils.train_surrogate_rf_model(x=x_train, y=y_train, n_estimators=100, max_depth=10,
+    if model is None:
+        if (x_train is not None) and (x_test is not None):
+            model = metric_utils.train_surrogate_rf_model(x=x_train, y=y_train, n_estimators=100, max_depth=10,
                                                       random_state=0)
+        else:
+            raise AttributeError("x_train and x_test must be available to train a surrogate model if a model is not "
+                                 "provided.")
     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
     xpl = SmartExplainer(model=model)
-    ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
+    # to plot the stability plot, the model is not necessary if you have the y_targets as well.
     xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_test)
                 , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
                 , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
