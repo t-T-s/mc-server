@@ -44,7 +44,12 @@ def compacity_plot(contributions, selection, distance, nb_features):
 
 def stability_plot(x_test, contributions, y_target, selection, max_points, max_features, x_train=None, y_train=None,
                    model_stream=None):
-    model: BaseEstimator = joblib.load(model_stream)
+    model: BaseEstimator = joblib.load(model_stream)  # type hinting only
+    if not isinstance(model, BaseEstimator):
+        raise TypeError("Currently the stability plot with an externally trained model is only supported for sci-kit "
+                        "learn models."
+                        "The model uploaded is not of type sklearn.base.BaseEstimator. "
+                        "You can opt for training a surrogate model to plot the stability")
     stability_graph = shapash_stability_plot(
         x_train=x_train
         , y_train=y_train

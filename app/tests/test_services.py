@@ -42,7 +42,7 @@ def test_service_compacity_plot():
 def test_service_stability_with_received_model_plot():
     # Basic invocation test
     rf_model = metric_utils.create_dummy_model()
-    model_file_name = "assets/rf_model.joblib"
+    rf_model = Exception()
     model_buf = io.BytesIO()
     joblib.dump(rf_model, model_buf)
     selection = None
