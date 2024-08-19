@@ -124,7 +124,8 @@ async def post_stability_with_surrogate_model_training_plot(background_tasks: Ba
 
 @app.post("/stability_pre_trained_model_metric_plot", status_code=200)
 async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks,
-                                                     file: UploadFile = File(...)):
+                                                     file: UploadFile = File(
+                                                         description=f"The file should contain fields of f{StabilityFileData} as a dictionary")):
     # TODO: complete the docstring
     """
      The stability plot is generated using this endpoint. The endpoint receives a file preferably a dictionary
