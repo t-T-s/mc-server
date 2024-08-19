@@ -122,18 +122,24 @@ async def post_stability_with_surrogate_model_training_plot(background_tasks: Ba
     return Response(buf_contents, headers=headers, media_type='image/png')
 
 
-@app.post("/stability_pre_trained_model_metric_plot", status_code=200)
+@app.post("/stability_pre_trained_model_metric_plot", status_code=200
+    , summary="Generate the stability plot with a pre-trained model")
 async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks,
-                                                     file: UploadFile = File(
-                                                         description=f"The file should contain fields of f{StabilityFileData} as a dictionary")):
-    # TODO: complete the docstring
+                                                     file: UploadFile = File(...)):
     """
      The stability plot is generated using this endpoint. The endpoint receives a file preferably a dictionary
-     (refer the test_post_stability_with_pretrained_model_plot for more implementation details).
-    :param file:
-        dictionary structure:
+     (refer the test_post_stability_with_pre_trained_model_plot for more implementation details).
 
-    :return: Image of the stability plot.
+    - **param** bytes file: The file should contain fields of StabilityFileData schema as a dictionary.
+                            The following are the keys of the dictionary that should be sent as a file:
+        - **x_input**: List[List[float]]\*: The input data for the model.
+        - **contributions** List[List[float]]\*: The contributions of the model.
+        - **y_target** List[List[float]]\*: The target data for the model.
+        - **selection** Union[List[int], None]: The selected features.
+        - **max_points** Union[int, None]: default=500 The maximum number of points for neighbourhood.
+        - **max_features** Union[int, None]: The maximum number of features use.
+        - **pre_trained_model** bytes: The pre-trained model.
+    - **return** .PNG stability_with_pre_trained_model.png: Image of the stability plot.
     """
     file_bytes = await file.read()
     image_buffer = stability_pre_trained_model_plot(file_bytes)

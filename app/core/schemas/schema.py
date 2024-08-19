@@ -97,9 +97,9 @@ class StabilityFileData(BaseModel):
                                                         [0.07235874, 0.92571017, 0.05129698, 0.92341386]]])
     y_target: List[List[float]] = Field(examples=[[[1], [1], [0], [1], [0], [0], [0], [1], [0], [1], [1]]])
     selection: Union[List[int], None] = Field(examples=[[0, 1]])
-    max_points: Union[int, None] = Field(examples=[500])
+    max_points: Union[int, None] = Field(default=500, examples=[500])
     max_features: Union[int, None] = Field(examples=[2])
-    pre_trained_model: Union[bytes] = None
+    pre_trained_model: bytes = None
 
     @model_validator(mode='after')
     def check_feature_columns(self) -> 'StabilityData':
