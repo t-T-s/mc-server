@@ -1,11 +1,11 @@
 import json
 
-from fastapi import FastAPI, Response, BackgroundTasks, UploadFile, File, Depends, Body
+from fastapi import FastAPI, Response, BackgroundTasks, UploadFile, File
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
     evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot, \
     stability_surrogate_model_plot, stability_pre_trained_model_plot
 from app.core.schemas.schema import ClfLabels, ConsistencyContributions, CompacityContributions, UserDiversityInput, \
-    StabilityData, StabilityFileData
+    StabilityData
 from app.utils.mc_exceptions import http_exception_handler, global_exception_handler
 from fastapi import HTTPException
 
@@ -127,7 +127,7 @@ async def post_stability_with_surrogate_model_training_plot(background_tasks: Ba
 async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks,
                                                      file: UploadFile = File(...)):
     """
-     The stability plot is generated using this endpoint. The endpoint receives a file preferably a dictionary
+     Generates the stability plot. The endpoint should receive a file preferably a dictionary
      (refer the test_post_stability_with_pre_trained_model_plot for more implementation details).
 
     - **param** bytes file: The file should contain fields of StabilityFileData schema as a dictionary.
