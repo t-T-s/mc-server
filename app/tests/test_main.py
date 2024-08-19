@@ -47,9 +47,10 @@ def test_post_accuracy_1d_length():
 
 def test_post_consistency_scores():
     # Output test: Basic invocation test
-    contrib_dict = {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
-                    'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
-                    'LIME': [[0.14, 0.2], [0.34, 0.4]]}
+    contrib_dict = {"contribution_dict": {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
+                                          'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
+                                          'LIME': [[0.14, 0.2], [0.34, 0.4]]}
+                    }
     response = client.post("/consistency_metric", json=contrib_dict)
     print(response.json())
     assert response.status_code == 200
@@ -61,9 +62,10 @@ def test_post_consistency_scores():
 
 def test_post_consistency_plot():
     # Output test: Basic invocation test
-    contrib_dict = {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
+    contrib_dict = {"contribution_dict": {'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
                     'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
                     'LIME': [[0.14, 0.2], [0.34, 0.4]]}
+                    }
     response = client.post("/consistency_metric_plot", json=contrib_dict)
     assert response.status_code == 200
     assert response.headers['Content-Type'] == 'image/png'
