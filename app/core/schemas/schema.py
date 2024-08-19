@@ -1,6 +1,7 @@
 from pydantic import BaseModel, model_validator
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Any
 from fastapi import HTTPException
+import _io
 
 
 # pydantic models
@@ -72,6 +73,12 @@ class Contributions(BaseModel):
 
 
 class StabilityData(BaseModel):
+    x_train: Union[List[List[float]], None] = [[0.24763825, 0.4624466, 0.1439733, 0.63356432],
+                                  [0.89960405, 0.60607923, 0.58054955, 0.07378852],
+                                  [0.91335706, 0.77419346, 0.70098694, 0.08870475],
+                                  [0.46562798, 0.85730786, 0.53299792, 0.84305255],
+                                  [0.32298965, 0.86707571, 0.73935329, 0.8347728]]
+    y_train: Union[List[List[float]], None] = [[1], [1], [1], [1], [0]]
     # Contributions from one type of explainer
     x_input: List[List[float]] = [[0.46582937, 0.36313128, 0.17189367, 0.01546506],
                                   [0.507121, 0.01918931, 0.78464877, 0.77427306],
@@ -99,15 +106,21 @@ class StabilityData(BaseModel):
     selection: Union[List[int], None] = [0, 1]
     max_points: Union[int, None] = 500
     max_features: Union[int, None] = 2
+    pre_trained_model: Union[None, bytes] = None
 
     @model_validator(mode='after')
     def check_feature_columns(self) -> 'StabilityData':
         # get all fields in the model
         # check if the internal lists are of same length
         if len(self.contributions) < 10 or len(self.x_input) < 10 or len(self.y_target) < 10:
-            raise HTTPException(status_code=422, detail="The stability plot is only implemented for X data size of 10 "
-                                                        "rows or more."
-                                                        "The contributions and y_target should be also of the same "
+            raise HTTPException(status_code=422, detail="The stability plot is only implemented for contributions "
+                                                        "size of 10 rows or more. Thereby x_test and y_target must be "
+                                                        "of the same size")
+        if not (len(self.contributions) == len(self.x_input) == len(self.y_target)):
+            raise HTTPException(status_code=422, detail="The contributions, x_input and y_target should be of "
+                                                        "the same length")
+        if len(self.x_train) != len(self.y_train):
+            raise HTTPException(status_code=422, detail="The training dataset x_train and y_train should be of same "
                                                         "length")
         if len(set(len(row) for row in self.contributions)) > 1:
             raise HTTPException(status_code=422, detail='Contribution rows must be of same length for all the rows')

@@ -25,7 +25,8 @@ async def global_exception_handler(request: Request, exc: Exception):
             "path_params": request.path_params,
             "query_params": dict(request.query_params),
             "error": str(exc),
-            # "traceback": traceback.format_exc().strip().split("\n")[-1], # It is a security risk to include this!
+            "traceback": traceback.format_exc().strip().split("\n")[-1],  # It is a security risk to include the
+            # whole traceback!
             "method": request.method,
             "url": str(request.url),
         },

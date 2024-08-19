@@ -141,44 +141,44 @@ def shapash_stability_plot(x_test,
     return stability_plot
 
 
-def shapash_feature_stability(x_encoded, contributions, y_target, selection=None, max_points=500):
-    """
-    model: dummy model
-    contributions: contributions as a list of lists
-    selection: a sample of the dataset on which to evaluate the metric expressed
-    as a list of indices (by default take the whole dataset if not too big)
-    list of indices of datapoints (The length of the output lists will be equal
-    to the length of the selection list)
-    distance (float): how close we want to be the reference model with all features (default 90%)
-                     – Left graph
-    nb_features (int): how many features are selected to evaluate the approximation (default 5)
-                    – Right graph
-
-    return: dict of features compacity
-    """
-    model = metric_utils.create_dummy_model()
-    # Not the best method to do this, but it works. Later we can implement in a cleaner way.
-    xpl = SmartExplainer(model=model)
-    ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
-    xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
-                , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
-                , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
-    print("x_init: ", xpl.x_init)
-    print("xpl_feature_stability_after_compile: ", xpl.features_stability)
-    if selection is None:
-        if xpl.x_init.shape[0] <= max_points:
-            list_ind = xpl.x_init.index.tolist()
-            feature_stability = xpl.compute_features_stability(list_ind)
-            print("list_ind: ", list_ind)
-            print("feature_stability_1: ", feature_stability)
-        else:
-            list_ind = random.sample(xpl.x_init.index.tolist(), max_points)
-            feature_stability = xpl.compute_features_stability(list_ind)
-            print("feature_stability_2:", feature_stability)
-    else:
-        feature_stability = xpl.compute_features_stability(selection)
-        print("feature_stability_3:", feature_stability)
-    return feature_stability
+# def shapash_feature_stability(x_encoded, contributions, y_target, selection=None, max_points=500):
+#     """
+#     model: dummy model
+#     contributions: contributions as a list of lists
+#     selection: a sample of the dataset on which to evaluate the metric expressed
+#     as a list of indices (by default take the whole dataset if not too big)
+#     list of indices of datapoints (The length of the output lists will be equal
+#     to the length of the selection list)
+#     distance (float): how close we want to be the reference model with all features (default 90%)
+#                      – Left graph
+#     nb_features (int): how many features are selected to evaluate the approximation (default 5)
+#                     – Right graph
+#
+#     return: dict of features compacity
+#     """
+#     model = metric_utils.create_dummy_model()
+#     # Not the best method to do this, but it works. Later we can implement in a cleaner way.
+#     xpl = SmartExplainer(model=model)
+#     ## to plot the stability plot, the model is not necessary if you have the y_targets as well.
+#     xpl.compile(x=metric_utils.convert_array_like_to_dataframe(x_encoded)
+#                 , contributions=metric_utils.convert_array_like_to_dataframe(contributions)
+#                 , y_target=metric_utils.convert_array_like_to_dataframe(y_target))
+#     print("x_init: ", xpl.x_init)
+#     print("xpl_feature_stability_after_compile: ", xpl.features_stability)
+#     if selection is None:
+#         if xpl.x_init.shape[0] <= max_points:
+#             list_ind = xpl.x_init.index.tolist()
+#             feature_stability = xpl.compute_features_stability(list_ind)
+#             print("list_ind: ", list_ind)
+#             print("feature_stability_1: ", feature_stability)
+#         else:
+#             list_ind = random.sample(xpl.x_init.index.tolist(), max_points)
+#             feature_stability = xpl.compute_features_stability(list_ind)
+#             print("feature_stability_2:", feature_stability)
+#     else:
+#         feature_stability = xpl.compute_features_stability(selection)
+#         print("feature_stability_3:", feature_stability)
+#     return feature_stability
 
 
 def evasion_impact(ground_truth, predictions) -> float:
