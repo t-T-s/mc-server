@@ -27,13 +27,13 @@ class ClfLabels(BaseModel):
         return self
 
 
-class ContributionsDict(BaseModel):
+class ConsistencyContributions(BaseModel):
     contribution_dict: Dict[str, List[List[float]]] = Field(examples=[{'KernelSHAP': [[0.15, 0.2], [0.3, 0.42]],
                                                                        'SamplingSHAP': [[0.12, 0.2], [0.32, 0.4]],
                                                                        'LIME': [[0.14, 0.2], [0.34, 0.4]]}])
 
     @model_validator(mode='after')
-    def check_feature_columns(self) -> 'ContributionsDict':
+    def check_feature_columns(self) -> 'ConsistencyContributions':
         # get all fields in the model
         # check if the internal lists are of same length
         # Initialize variables to store the expected number of rows and row length
@@ -56,15 +56,15 @@ class ContributionsDict(BaseModel):
         return self
 
 
-class Contributions(BaseModel):
+class CompacityContributions(BaseModel):
     # Contributions from one type of explainer
     contributions: List[List[float]] = Field(examples=[[[0.15, 0.2, 0.4, 0.01], [0.3, 0.42, 0.34, 0.012]]])
-    selection: Union[List[int], None] = Field(examples=[[0, 1]])
-    distance: Union[float, None] = Field(examples=[0.9])
-    nb_features: Union[int, None] = Field(examples=[2])
+    selection: Union[List[int], None] = Field(default=None, examples=[[0, 1]])
+    distance: Union[float, None] = Field(default=None, examples=[0.9])
+    nb_features: Union[int, None] = Field(default=None, examples=[2])
 
     @model_validator(mode='after')
-    def check_feature_columns(self) -> 'Contributions':
+    def check_feature_columns(self) -> 'CompacityContributions':
         # get all fields in the model
         # check if the internal lists are of same length
         if len(set(len(row) for row in self.contributions)) > 1:
@@ -152,9 +152,9 @@ class StabilityData(BaseModel):
                                                         [0.09295941, 0.83894879, 0.46052668, 0.1308371],
                                                         [0.07235874, 0.92571017, 0.05129698, 0.92341386]]])
     y_target: List[List[float]] = Field(examples=[[[1], [1], [0], [1], [0], [0], [0], [1], [0], [1], [1]]])
-    selection: Union[List[int], None] = Field(examples=[[0, 1]])
-    max_points: Union[int, None] = Field(examples=[500])
-    max_features: Union[int, None] = Field(examples=[2])
+    selection: Union[List[int], None] = Field(default=None, examples=[[0, 1]])
+    max_points: Union[int, None] = Field(default=500, examples=[500])
+    max_features: Union[int, None] = Field(default=None, examples=[2])
 
     @model_validator(mode='after')
     def check_feature_columns(self) -> 'StabilityData':

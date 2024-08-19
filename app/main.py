@@ -4,7 +4,7 @@ from fastapi import FastAPI, Response, BackgroundTasks, UploadFile, File, Depend
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
     evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot, \
     stability_surrogate_model_plot, stability_pre_trained_model_plot
-from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput, \
+from app.core.schemas.schema import ClfLabels, ConsistencyContributions, CompacityContributions, UserDiversityInput, \
     StabilityData, StabilityFileData
 from app.utils.mc_exceptions import http_exception_handler, global_exception_handler
 from fastapi import HTTPException
@@ -27,7 +27,7 @@ async def post_accuracy(payload: ClfLabels):
 
 
 @app.post("/consistency_metric", status_code=200)
-async def post_consistency(payload: ContributionsDict):
+async def post_consistency(payload: ConsistencyContributions):
     contributions = payload.contribution_dict
 
     average_consistency, pairwise_scores = consistency_scores(contributions)
@@ -39,7 +39,7 @@ async def post_consistency(payload: ContributionsDict):
 
 
 @app.post("/consistency_metric_plot", status_code=200)
-async def post_consistency_plot(payload: ContributionsDict
+async def post_consistency_plot(payload: ConsistencyContributions
                                 , background_tasks: BackgroundTasks):
     contributions = payload.contribution_dict
 
@@ -52,7 +52,7 @@ async def post_consistency_plot(payload: ContributionsDict
 
 # To be implemented
 @app.post("/compacity_metric", status_code=200)
-async def post_compacity(payload: Contributions):
+async def post_compacity(payload: CompacityContributions):
     contributions = payload.contributions
     selection = payload.selection
     distance = payload.distance
@@ -67,7 +67,7 @@ async def post_compacity(payload: Contributions):
 
 
 @app.post("/compacity_metric_plot", status_code=200)
-async def post_compacity_plot(payload: Contributions
+async def post_compacity_plot(payload: CompacityContributions
                               , background_tasks: BackgroundTasks):
     contributions = payload.contributions
     selection = payload.selection
@@ -124,8 +124,7 @@ async def post_stability_with_surrogate_model_training_plot(background_tasks: Ba
 
 @app.post("/stability_pre_trained_model_metric_plot", status_code=200)
 async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks,
-                                                     file: UploadFile = File(None,
-                                                example={"schema": StabilityFileData})):
+                                                     file: UploadFile = File(...)):
     # TODO: complete the docstring
     """
      The stability plot is generated using this endpoint. The endpoint receives a file preferably a dictionary
