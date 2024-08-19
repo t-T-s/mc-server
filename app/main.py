@@ -3,12 +3,11 @@ import json
 from fastapi import FastAPI, Response, BackgroundTasks, UploadFile, File, Depends, Body
 from app.services.metrics_service import clf_accuracy_score, consistency_scores, compacity_scores, \
     evasion_impact_score, consistency_plot, compacity_plot, user_diversity_score, user_diversity_plot, \
-    stability_pre_trained_model_plot, stability_surrogate_model_plot
+    stability_surrogate_model_plot, stability_pre_trained_model_plot
 from app.core.schemas.schema import ClfLabels, ContributionsDict, Contributions, UserDiversityInput, \
-    StabilityData
+    StabilityData, StabilityFileData
 from app.utils.mc_exceptions import http_exception_handler, global_exception_handler
 from fastapi import HTTPException
-
 
 app = FastAPI()
 app.add_exception_handler(HTTPException, http_exception_handler)
@@ -89,20 +88,11 @@ async def post_compacity_plot(payload: Contributions
 async def post_stability_with_surrogate_model_training_plot(background_tasks: BackgroundTasks
                                                             , payload: StabilityData
                                                             ):
-    # TODO: complete the docstring
     """
      The stability plot is generated using this endpoint. The endpoint receives a json with the following keys.
      (refer the test_post_stability_with_surrogate_model_training_plot for more implementation details).
-    :param StabilityData:
-        "x_train": List[List[float]]
-        "y_train": List[List[float]]
-        "x_input": List[List[float]]
-        "contributions": List[List[float]]
-        "y_target": Union[List[int], None]
-        "selection": Union[List[int], None]
-        "max_points": Union[int, None]
-        "max_features": Union[int, None]
-    :return: Image of the stability plot.
+    :param StabilityData payload:
+    :return Response response: Image of the stability plot.
     """
 
     x_train = payload.x_train
@@ -133,22 +123,16 @@ async def post_stability_with_surrogate_model_training_plot(background_tasks: Ba
 
 
 @app.post("/stability_pre_trained_model_metric_plot", status_code=200)
-async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks
-                                                    , file: UploadFile = File(None)
-                                                    ):
+async def post_stability_with_pre_trained_model_plot(background_tasks: BackgroundTasks,
+                                                     file: UploadFile = File(None,
+                                                example={"schema": StabilityFileData})):
     # TODO: complete the docstring
     """
      The stability plot is generated using this endpoint. The endpoint receives a file preferably a dictionary
      (refer the test_post_stability_with_pretrained_model_plot for more implementation details).
     :param file:
         dictionary structure:
-            "x_input": List[List[float]]
-            "contributions": List[List[float]]
-            "y_target": Union[List[int], None]
-            "selection": Union[List[int], None]
-            "max_points": Union[int, None]
-            "max_features": Union[int, None]
-            "pre_trained_model": Bytes(BaseEstimator)  - Bytes of the pre-trained model of BaseEstimator type
+
     :return: Image of the stability plot.
     """
     file_bytes = await file.read()

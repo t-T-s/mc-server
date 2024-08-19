@@ -87,9 +87,16 @@ def test_post_compacity_plot():
     print(response.headers)
     print("Image saved to test_compacity_endpoint_response_image.png successfully!")
 
+
 def test_post_stability_with_surrogate_model_training_plot():
     # Output test: Basic invocation test
     item_data = {
+        "x_train": [[0.24763825, 0.4624466, 0.1439733, 0.63356432],
+                    [0.89960405, 0.60607923, 0.58054955, 0.07378852],
+                    [0.91335706, 0.77419346, 0.70098694, 0.08870475],
+                    [0.46562798, 0.85730786, 0.53299792, 0.84305255],
+                    [0.32298965, 0.86707571, 0.73935329, 0.8347728]],
+        "y_train": [[1], [1], [1], [1], [0]],
         "x_input": [[0.46582937, 0.36313128, 0.17189367, 0.01546506],
                     [0.507121, 0.01918931, 0.78464877, 0.77427306],
                     [0.50496966, 0.98061098, 0.27967449, 0.29417485],
@@ -127,7 +134,9 @@ def test_post_stability_with_surrogate_model_training_plot():
     with open("assets/test_post_stability_with_surrogate_model_training_plot_endpoint_response_image.png", "wb") as f:
         f.write(response.content)
     print(response.headers)
-    print("Image saved to test_post_stability_with_surrogate_model_training_plot_endpoint_response_image.png successfully!")
+    print(
+        "Image saved to test_post_stability_with_surrogate_model_training_plot_endpoint_response_image.png successfully!")
+
 
 def test_post_stability_with_pretrained_model_plot():
     rf_model = metric_utils.create_dummy_model()
@@ -169,7 +178,7 @@ def test_post_stability_with_pretrained_model_plot():
 
     response = client.post(
         "/stability_pre_trained_model_metric_plot",
-        files={"file": ("request.bytes", request_buf.getvalue())}
+        files={"file": ("request.bytes", bytes(request_buf.getvalue()))}
     )
     print(response)
     assert response.status_code == 200

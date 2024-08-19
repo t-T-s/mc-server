@@ -1,6 +1,8 @@
 import pytest
-from app.services.metrics_service import consistency_scores, consistency_plot, \
-    compacity_plot, user_diversity_plot, metric_utils, stability_surrogate_model_plot, stability_pre_trained_model_plot
+from app.services.metrics_service import (consistency_scores, consistency_plot, \
+                                          compacity_plot, user_diversity_plot, metric_utils,
+                                          stability_surrogate_model_plot,
+                                          stability_pre_trained_model_plot)
 import io
 import joblib
 
@@ -39,7 +41,7 @@ def test_service_compacity_plot():
     assert isinstance(comp_plot, io.BytesIO)
 
 
-def test_service_stability_with_received_model_plot():
+def test_service_stability_pre_trained_model_plot():
     # Basic invocation test
     rf_model = metric_utils.create_dummy_model()
     # rf_model = Exception()  # To check what happens when the type of rf_model changes
@@ -72,12 +74,12 @@ def test_service_stability_with_received_model_plot():
         "selection": [0, 1],
         "max_points": 500,
         "max_features": 2,
-        "pre_trained_model": model_buf
+        "pre_trained_model": model_buf.getvalue()
     }
     model_stream = io.BytesIO()
     joblib.dump(item_data, model_stream)
     stabl_plot = stability_pre_trained_model_plot(model_stream.getvalue())
-    with open("assets/test_stability_received_model_services_buffered_image.png", "wb") as f:
+    with open("assets/test_service_stability_pre_trained_model_services_buffered_image.png", "wb") as f:
         f.write(stabl_plot.getvalue())
     assert isinstance(stabl_plot, io.BytesIO)
 
@@ -87,14 +89,14 @@ def test_service_stability_with_surrogate_model_training_plot():
     selection = None
     max_points = 500
     max_features = 2
+    # The number of inputs have to be greater than 10
     x_train = [[0.24763825, 0.4624466, 0.1439733, 0.63356432],
                [0.89960405, 0.60607923, 0.58054955, 0.07378852],
                [0.91335706, 0.77419346, 0.70098694, 0.08870475],
                [0.46562798, 0.85730786, 0.53299792, 0.84305255],
                [0.32298965, 0.86707571, 0.73935329, 0.8347728]]
     y_train = [[1], [1], [1], [1], [0]]
-    # The number of inputs have to be greater than 10
-    x = [[0.46582937, 0.36313128, 0.17189367, 0.01546506],
+    x_test = [[0.46582937, 0.36313128, 0.17189367, 0.01546506],
          [0.507121, 0.01918931, 0.78464877, 0.77427306],
          [0.50496966, 0.98061098, 0.27967449, 0.29417485],
          [0.3521993, 0.48835738, 0.23460793, 0.64657831],
@@ -121,14 +123,13 @@ def test_service_stability_with_surrogate_model_training_plot():
     stabl_plot = stability_surrogate_model_plot(
         x_train=x_train
         , y_train=y_train
-        , model_stream=None
-        , x_test=x
+        , x_test=x_test
         , contributions=contributions
         , y_target=y_target
         , selection=selection
         , max_points=max_points
         , max_features=max_features)
-    with open("assets/test_stability_surrogate_training_buffered_image.png", "wb") as f:
+    with open("assets/test_service_stability_with_surrogate_model_training_buffered_image.png", "wb") as f:
         f.write(stabl_plot.getvalue())
     assert isinstance(stabl_plot, io.BytesIO)
 

@@ -1,7 +1,7 @@
 from app.core.metrics import scikit_accuracy, shapash_consistency, shapash_compacity_from_contributions, \
     evasion_impact, shapash_consistency_plot, shapash_compacity_plot, tsne_user_diversity, tsne_user_diversity_plot, \
     shapash_stability_plot
-from app.core.schemas.schema import StabilityData
+from app.core.schemas.schema import StabilityFileData
 from app.core import metric_utils
 import joblib, io
 from sklearn.base import BaseEstimator
@@ -45,7 +45,6 @@ def compacity_plot(contributions, selection, distance, nb_features):
 
 def stability_surrogate_model_plot(x_test, contributions, y_target, selection, max_points, max_features, x_train=None
                                    , y_train=None):
-    ## check if the x_train and y_train are not none
     if x_train is None or y_train is None:
         raise ValueError("The training data x_train and y_train must be provided to train the surrogate model")
     stability_graph = shapash_stability_plot(
@@ -64,7 +63,7 @@ def stability_surrogate_model_plot(x_test, contributions, y_target, selection, m
 def stability_pre_trained_model_plot(file_bytes):
 
     data_dict = joblib.load(io.BytesIO(file_bytes))
-    payload = StabilityData(**data_dict)
+    payload = StabilityFileData(**data_dict)
     # check if the received model is not none
     if payload.pre_trained_model is None:
         raise ValueError("The received model is not provided. Please provide the model to plot the stability")
